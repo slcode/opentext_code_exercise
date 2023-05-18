@@ -18,7 +18,7 @@ Under the project folder, where the CMakeLists.txt locates, run below to compile
 
 ```rm -rf build && mkdir build && cd build && cmake .. && make && cd ..```
 
-Then to run it
+Then to run it (note the input file cd_cataglog.xml is not included in this repo)
 
 ```./build/xml_to_html cd_catalog.xml output.html```
 
