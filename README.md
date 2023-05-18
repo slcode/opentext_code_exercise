@@ -23,3 +23,6 @@ Then to run it (note the input file cd_cataglog.xml is not included in this repo
 ```./build/xml_to_html cd_catalog.xml output.html```
 
 The output will be in the output.html file.
+
+# TODO
+Add unit test.
