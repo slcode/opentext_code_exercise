@@ -16,7 +16,7 @@
 # How to use
 Under the project folder, where the CMakeLists.txt locates, run below to compile it.
 
-```rm -rf build && mkdir build && cd build && cmake .. && make && cd ..```
+```make```
 
 Then to run it (note the input file cd_cataglog.xml is not included in this repo)
 
