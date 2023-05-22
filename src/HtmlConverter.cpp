@@ -1,13 +1,16 @@
 #include <fstream>
 #include <set>
 #include <unordered_map>
+#include <exception>
+#include <iostream>
+
 #include "HtmlConverter.h"
 
 HtmlConverter::HtmlConverter() {}
 
 HtmlConverter::~HtmlConverter() {}
 
-std::string HtmlConverter::Convert(std::unique_ptr<tinyxml2::XMLDocument> document)
+std::string HtmlConverter::Convert(std::unique_ptr<tinyxml2::XMLDocument> document, std::string_view childName)
 {
     std::string htmlContent = "<table>\n";
     std::set<std::string> columnTitles;
@@ -20,11 +23,11 @@ std::string HtmlConverter::Convert(std::unique_ptr<tinyxml2::XMLDocument> docume
     }
 
     // Iterate over elements to get the column titles
-    for (tinyxml2::XMLElement *cdElement = rootElement->FirstChildElement("CD"); cdElement; cdElement = cdElement->NextSiblingElement("CD"))
+    for (tinyxml2::XMLElement *cdElement = rootElement->FirstChildElement(childName.data()); cdElement; cdElement = cdElement->NextSiblingElement(childName.data()))
     {
         for (tinyxml2::XMLElement *childElement = cdElement->FirstChildElement(); childElement; childElement = childElement->NextSiblingElement())
         {
-            std::string tagName = childElement->Value();
+            const char *tagName = childElement->Value();
             columnTitles.insert(tagName);
         }
     }
@@ -37,18 +40,21 @@ std::string HtmlConverter::Convert(std::unique_ptr<tinyxml2::XMLDocument> docume
     htmlContent += "  </tr>\n";
 
     // Get the values, repalce missing with NULL.
-    for (tinyxml2::XMLElement *cdElement = rootElement->FirstChildElement("CD"); cdElement; cdElement = cdElement->NextSiblingElement("CD"))
+    for (tinyxml2::XMLElement *cdElement = rootElement->FirstChildElement(childName.data()); cdElement; cdElement = cdElement->NextSiblingElement(childName.data()))
     {
         std::unordered_map<std::string, std::string> row;
         for (tinyxml2::XMLElement *childElement = cdElement->FirstChildElement(); childElement; childElement = childElement->NextSiblingElement())
         {
-            std::string tagName = childElement->Value();
-            std::string value = childElement->GetText();
-            row[tagName] = value;
+            const char *tagName = childElement->Value();
+            const char *value = childElement->GetText();
+            if (value != nullptr)
+            {
+                row[tagName] = value;
+            }
         }
 
         htmlContent += "  <tr>\n";
-        for (const auto &tag : columnTitles)
+        for (const std::string &tag : columnTitles)
         {
             htmlContent += "    <td>" + (row[tag] != "" ? row[tag] : "NULL") + "</td>\n";
         }
@@ -60,7 +66,7 @@ std::string HtmlConverter::Convert(std::unique_ptr<tinyxml2::XMLDocument> docume
     return htmlContent;
 }
 
-bool HtmlConverter::SaveToFile(const std::string &filename, const std::string &content)
+bool HtmlConverter::SaveToFile(std::string_view filename, std::string_view content)
 {
     std::ofstream outputFile(filename);
     if (!outputFile)

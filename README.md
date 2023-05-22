@@ -5,8 +5,6 @@
 
 * I did not add much validatioin of the input. Schema validation might be needed depends on the use cases.
 
-* "CD" is hard code in the html converter. This could be passed as an argument if needed.
-
 * Missing values are replaced by NULL value.
 
 * Only tested on MacOS because of resource and time constraint. 
